@@ -63,47 +63,51 @@
 
           <p class="meta" style="background: url('<?= $item->get_feed_icon()?>') no-repeat;"><a href="<?= $this->config->item('base_url')."items/site/".$item->get_feed_domain(); ?>"><?= $item->get_feed_domain(); ?></a> <?= $item->get_human_date() ?></p>
 
-          <!-- If item is a blog item -->
           <?php if ($item->get_feed_domain() == str_replace("/","",str_replace("http://","",$this->config->item('base_url')))): ?>
+            <!-- Item is a blog item -->
             <div class="box blog">
               <p class="title"><a href="<?= $item->get_permalink()?>"><?= $item->get_title()?></a></p>
               <p class="content"><?= word_limiter(strip_tags($item->get_content()), 40)?></p>
             </div>
 
-          <!-- If item comes from twitter.com -->
+          <?php elseif ($item->has_image() && !$item->has_video()): ?>
+            <!-- Item has a photo -->
+            <?php if ( $item->get_feed_domain() == 'flickr.com' ) : ?>
+            <div class="box photo" style="background: url('<?= $item->item_data['flickr_com']['image']['m']?>') center center no-repeat;">
+            <?php else : ?>
+            <div class="box photo" style="background: url('<?= $item->get_image(); ?>') center center no-repeat;">
+            <?php endif; ?>
+              <p class="content">
+                <strong><a href="<?= $item->get_original_permalink()?>"><?= $item->get_title()?></a></strong><br/>
+                <?= word_limiter(strip_tags($item->get_content()), 15)?>
+              </p>
+            </div>
+
+          <?php elseif ($item->has_video()): ?>
+            <!-- If item has a video -->
+            <div class="box video">
+              <?= $item->get_video()?>
+              <p class="content"><a href="<?= $item->get_original_permalink()?>"><?= word_limiter(strip_tags($item->get_content()), 5)?></a></p>
+            </div>
+
+          <?php elseif ($item->get_feed_domain() == 'google.com' OR $item->get_feed_domain() == 'digg.com' OR $item->get_feed_domain() == 'stumbleupon.com'): ?>
+            <!-- Item comes from google.com (Google Reader shared items), digg.com, stumbleupon.com -->
+            <div class="box gen">
+              <p class="title"><a href="<?= $item->get_original_permalink()?>"><?= $item->get_title()?></a></p>
+              <p class="content"><?= word_limiter(strip_tags($item->get_content()), 40)?></p>
+            </div>
+
           <?php elseif ($item->get_feed_domain() == 'twitter.com'): ?>
+            <!-- Item comes from twitter.com -->
             <div class="box twitter">
               <!-- 48x48 Twitter Profile Pic -->
               <img src="http://www.gravatar.com/avatar/7fc536d7ba50e1fc2deebaed2f1eab59?s=48" alt="Twitter" class="profile-pic" />
               <p class="content"><a href="<?= $item->get_original_permalink()?>"><?= $item->get_title()?></a></p>
             </div>
 
-          <!-- If item comes from google.com (Google Reader shared items), digg.com, stumbleupon.com -->
-          <?php elseif ($item->get_feed_domain() == 'google.com' OR $item->get_feed_domain() == 'digg.com' OR $item->get_feed_domain() == 'stumbleupon.com'): ?>
-            <div class="box gen">
-              <p class="title"><a href="<?= $item->get_original_permalink()?>"><?= $item->get_title()?></a></p>
-              <p class="content"><?= word_limiter(strip_tags($item->get_content()), 40)?></p>
-            </div>
 
-          <!-- If item has a video -->
-          <?php elseif ($item->has_video()): ?>
-            <div class="box video">
-              <?= $item->get_video()?>
-              <p class="content"><a href="<?= $item->get_original_permalink()?>"><?= word_limiter(strip_tags($item->get_content()), 5)?></a></p>
-            </div>
-
-          <!-- If item has a photo -->
-          <?php elseif ($item->has_image() && !$item->has_video()): ?>
-            <?php if ( $item->get_feed_domain() == 'flickr.com' ) : ?>
-              <div class="box photo" style="background: url('<?= $item->item_data['flickr_com']['image']['m']?>') center center no-repeat;">
-            <?php else : ?>
-              <div class="box photo" style="background: url('<?= $item->get_image(); ?>') center center no-repeat;">
-            <?php endif; ?>
-              <p class="content"><strong><a href="<?= $item->get_original_permalink()?>"><?= $item->get_title()?></a></strong><br /><?= word_limiter(strip_tags($item->get_content()), 20)?></p>
-            </div>
-
-          <!-- If item doesn't fall into any of the above groups -->
           <?php else: ?>
+            <!-- If item doesn't fall into any of the above groups -->
             <div class="box gen">
               <p class="title"><a href="<?= $item->get_original_permalink()?>"><?= $item->get_title()?></a></p>
               <p class="content"><?= word_limiter(strip_tags($item->get_content()), 40)?></p>
